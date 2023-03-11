@@ -10,9 +10,9 @@ namespace XboxMouseKeyboardEmulator
     {
         static void Main(string[] args)
         {
-            var inputMonitor = new XboxMouseController();
+            var inputMonitor = new XboxController();
             inputMonitor.Start();
-            Console.WriteLine("XBox Controller to Mouse has started");
+            Console.WriteLine("XBox Controller to Mouse Keyboard has started");
             Console.ReadLine();
         }
     }

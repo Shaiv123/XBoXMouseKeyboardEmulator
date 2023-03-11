@@ -1,23 +1,19 @@
-﻿using System.Threading;
+﻿using SharpDX.XInput;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using WindowsInput;
-using SharpDX.XInput;
 
 namespace XboxMouseKeyboardEmulator
 {
-    public class XboxMouseController
+    public class Keyboard
     {
-        private const int MovementDivider = 1_000;
-        private const int ScrollDivider = 10_000;
-        private const int RefreshRate = 60;
         private const int StickSensivity = 5000;
 
-        private Timer _timer;
-        private Controller _controller;
-        private IMouseSimulator _mouseSimulator;
         private IKeyboardSimulator _keyboardSimulator;
 
-        private bool _wasLMBDown;
-        private bool _wasRMBDown;
         private bool _wasSpaceDown;
 
         private bool _wasWDown;
@@ -38,28 +34,16 @@ namespace XboxMouseKeyboardEmulator
         private bool _was7Down;
         private bool _was8Down;
 
-
-        public XboxMouseController()
+        public Keyboard()
         {
-            _controller = new Controller(UserIndex.One);
-            _mouseSimulator = new InputSimulator().Mouse;
             _keyboardSimulator = new InputSimulator().Keyboard;
-            _timer = new Timer(obj => Update());
         }
 
-        public void Start()
+        public void update(State state)
         {
-            _timer.Change(0, 1000 / RefreshRate);
-        }
-
-        private void Update()
-        {
-            _controller.GetState(out var state);
-            MouseMove(state);
-            MouseLeftButton(state);
-            MouseRightButton(state);
-            WASDSPaceMovement(state);
-            KeyBind(state);
+            WASDMovement(state);
+            KeyCTRL(state);
+            KeyALT(state);
             KeyBindA(state);
             KeyBindB(state);
             KeyBindX(state);
@@ -69,41 +53,7 @@ namespace XboxMouseKeyboardEmulator
             KeyBindDL(state);
             KeyBindDU(state);
             KeyTab(state);
-        }
-
-        private void MouseRightButton(State state)
-        {
-            var isDown = state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder);
-            if (isDown && !_wasRMBDown) _mouseSimulator.RightButtonDown();
-            if (!isDown && _wasRMBDown) _mouseSimulator.RightButtonUp();
-            _wasRMBDown = isDown;
-        }
-
-        private void MouseLeftButton(State state)
-        {
-            var isDown = state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder);
-            if (isDown && !_wasLMBDown) _mouseSimulator.LeftButtonDown();
-            if (!isDown && _wasLMBDown) _mouseSimulator.LeftButtonUp();
-            _wasLMBDown = isDown;
-        }
-
-        private void MouseMove(State state)
-        {
-            var isDown = state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightThumb);
-            if (isDown)
-            {
-                var x = state.Gamepad.RightThumbX / ScrollDivider;
-                var y = state.Gamepad.RightThumbY / ScrollDivider;
-                _mouseSimulator.HorizontalScroll(x);
-                _mouseSimulator.VerticalScroll(y);
-            }
-            else
-            {
-                var x = state.Gamepad.RightThumbX / MovementDivider;
-                var y = state.Gamepad.RightThumbY / MovementDivider;
-                _mouseSimulator.MoveMouseBy(x, -y);
-            }
-            
+            KeySpace(state);
         }
 
         private void KeyTab(State state)
@@ -178,58 +128,35 @@ namespace XboxMouseKeyboardEmulator
             _was8Down = isDown;
         }
 
-        private void KeyBind(State state)
+
+        private void KeyALT(State state)
         {
-            var x = state.Gamepad.LeftTrigger;
-            var y = state.Gamepad.RightTrigger;
-            
-
-            if (x < 10 && y < 10)
-            {
-                if (_wasCTRLDown)
-                {
-                    _keyboardSimulator.KeyUp(WindowsInput.Native.VirtualKeyCode.CONTROL);
-                    _wasCTRLDown = false;
-                }
-                if (_wasAltDown)
-                {
-                    _keyboardSimulator.KeyUp(WindowsInput.Native.VirtualKeyCode.MENU);
-                    _wasAltDown = false;
-                }
-            }
-            else if (x > 10 && y > 10)
-            {
-                if (_wasCTRLDown) _keyboardSimulator.KeyUp(WindowsInput.Native.VirtualKeyCode.CONTROL);
-                if (_wasAltDown) _keyboardSimulator.KeyUp(WindowsInput.Native.VirtualKeyCode.MENU);
-                _wasAltDown = false;
-            }
-            else if (x > 10 && y < 10)
-            {
-                if (!_wasAltDown)
-                {
-                    _keyboardSimulator.KeyDown(WindowsInput.Native.VirtualKeyCode.MENU);
-                    _wasAltDown = true;
-                }
-            }
-            else if (x < 10 && y > 10)
-            {
-                if (!_wasCTRLDown)
-                {
-                    _keyboardSimulator.KeyDown(WindowsInput.Native.VirtualKeyCode.CONTROL);
-                    _wasCTRLDown = true;
-                }
-            }
-
+            var isDown = (state.Gamepad.RightTrigger > 10);
+            if (isDown && !_wasAltDown) _keyboardSimulator.KeyDown(WindowsInput.Native.VirtualKeyCode.MENU);
+            if (!isDown && _wasAltDown) _keyboardSimulator.KeyUp(WindowsInput.Native.VirtualKeyCode.MENU);
+            _wasAltDown = isDown;
+        }
+        private void KeyCTRL(State state)
+        {
+            var isDown = (state.Gamepad.LeftTrigger > 10);
+            if (isDown && !_wasCTRLDown) _keyboardSimulator.KeyDown(WindowsInput.Native.VirtualKeyCode.CONTROL);
+            if (!isDown && _wasCTRLDown) _keyboardSimulator.KeyUp(WindowsInput.Native.VirtualKeyCode.CONTROL);
+            _wasCTRLDown = isDown;
         }
 
-        private void WASDSPaceMovement(State state)
+        private void KeySpace(State state)
         {
-            var x = state.Gamepad.LeftThumbX;
-            var y = state.Gamepad.LeftThumbY;
             var isDown = state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftThumb);
             if (isDown && !_wasSpaceDown) _keyboardSimulator.KeyDown(WindowsInput.Native.VirtualKeyCode.SPACE);
             if (!isDown && _wasSpaceDown) _keyboardSimulator.KeyUp(WindowsInput.Native.VirtualKeyCode.SPACE);
             _wasSpaceDown = isDown;
+        }
+
+        private void WASDMovement(State state)
+        {
+            var x = state.Gamepad.LeftThumbX;
+            var y = state.Gamepad.LeftThumbY;
+            
 
             if (x > StickSensivity)
             {
@@ -272,7 +199,7 @@ namespace XboxMouseKeyboardEmulator
                     _wasADown = true;
                 }
 
-                
+
             }
 
             if (y > StickSensivity)
@@ -319,6 +246,5 @@ namespace XboxMouseKeyboardEmulator
 
 
         }
-
     }
 }
