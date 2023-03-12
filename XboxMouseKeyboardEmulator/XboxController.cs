@@ -28,8 +28,8 @@ namespace XboxMouseKeyboardEmulator
         private void Update()
         {
             _controller.GetState(out var state);
-            _mouse.update(state);
-            _keyboard.update(state);
+            _mouse.Update(state);
+            _keyboard.Update(state);
         }
     }
 }

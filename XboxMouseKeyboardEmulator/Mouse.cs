@@ -14,10 +14,10 @@ namespace XboxMouseKeyboardEmulator
             _mouse.Add(new MouseMove(GamepadButtonFlags.RightThumb));
         }
 
-        public void update(State state)
+        public void Update(State state)
         {
             foreach (IMouse i in _mouse)
-                i.update(state);
+                i.Update(state);
         }
     }
 }

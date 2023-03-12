@@ -4,6 +4,6 @@ namespace XboxMouseKeyboardEmulator
 {
     public interface IMouse
     {
-        void update(State state);
+        void Update(State state);
     }
 }

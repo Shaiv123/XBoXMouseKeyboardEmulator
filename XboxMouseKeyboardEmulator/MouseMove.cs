@@ -17,7 +17,7 @@ namespace XboxMouseKeyboardEmulator
             _flag = flag;
         }
 
-        public void update(State state)
+        public void Update(State state)
         {
             if (state.Gamepad.Buttons.HasFlag(_flag))
             {

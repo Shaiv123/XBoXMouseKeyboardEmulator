@@ -29,10 +29,10 @@ namespace XboxMouseKeyboardEmulator
             _keys.Add(new Key(GamepadButtonFlags.DPadUp, WindowsInput.Native.VirtualKeyCode.VK_8));
         }
 
-        public void update(State state)
+        public void Update(State state)
         {
             foreach(IKey i in _keys)
-                i.update(state);
+                i.Update(state);
         }
     }
 }

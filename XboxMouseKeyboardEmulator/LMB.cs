@@ -16,7 +16,7 @@ namespace XboxMouseKeyboardEmulator
             _flag = flag;
         }
 
-        public void update(State state)
+        public void Update(State state)
         {
             var isDown = state.Gamepad.Buttons.HasFlag(_flag);
             if (isDown && !_wasButtonDown) _mouseSimulator.LeftButtonDown();
