@@ -1,5 +1,4 @@
 ﻿using System.Threading;
-using WindowsInput;
 using SharpDX.XInput;
 
 namespace XboxMouseKeyboardEmulator
