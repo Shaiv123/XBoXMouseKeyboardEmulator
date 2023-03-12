@@ -11,8 +11,8 @@ namespace XboxMouseKeyboardEmulator
         public Keyboard()
         {
             _keys = new List<IKey>();
-            _keys.Add(new LTrigger(WindowsInput.Native.VirtualKeyCode.CONTROL));
-            _keys.Add(new RTrigger(WindowsInput.Native.VirtualKeyCode.MENU));
+            _keys.Add(new LTrigger(WindowsInput.Native.VirtualKeyCode.LCONTROL));
+            _keys.Add(new RTrigger(WindowsInput.Native.VirtualKeyCode.LMENU));
             _keys.Add(new LTUP(WindowsInput.Native.VirtualKeyCode.VK_W));
             _keys.Add(new LTDOWN(WindowsInput.Native.VirtualKeyCode.VK_S));
             _keys.Add(new LTLEFT(WindowsInput.Native.VirtualKeyCode.VK_A));
